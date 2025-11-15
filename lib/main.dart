@@ -11,108 +11,137 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Desain Widget Kombinasi'),
-          backgroundColor: Colors.blueAccent,
-        ),
-        // Latar belakang abu-abu agar kartu terlihat
-        backgroundColor: Colors.grey[200],
-        body: const Center(
-          // Memanggil widget utama kita
-          child: ProfileCard(),
+      title: 'Grid Produk',
+      theme: ThemeData(primarySwatch: Colors.blue),
+      home: const ProductGridPage(),
+    );
+  }
+}
+
+// -------------------------------------------------------------
+// DATA PRODUK
+// -------------------------------------------------------------
+class Product {
+  final String name;
+  final String imageUrl;
+  final String price;
+
+  Product({required this.name, required this.imageUrl, required this.price});
+}
+
+// -------------------------------------------------------------
+// HALAMAN GRID PRODUK
+// -------------------------------------------------------------
+class ProductGridPage extends StatelessWidget {
+  const ProductGridPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Product> products = [
+      Product(
+        name: "Kaos lengan panjang",
+        price: "Rp 50.000",
+        imageUrl:
+            "https://images.pexels.com/photos/6311584/pexels-photo-6311584.jpeg",
+      ),
+      Product(
+        name: "Sepatu Sport",
+        price: "Rp 120.000",
+        imageUrl:
+            "https://images.pexels.com/photos/2529148/pexels-photo-2529148.jpeg",
+      ),
+      Product(
+        name: "setelan baju olahraga cewek",
+        price: "Rp 25.000",
+        imageUrl:
+            "https://images.pexels.com/photos/6311396/pexels-photo-6311396.jpeg",
+      ),
+      Product(
+        name: "Setelan hodie dan celana",
+        price: "Rp 85.000",
+        imageUrl:
+            "https://images.pexels.com/photos/6311397/pexels-photo-6311397.jpeg",
+      ),
+    ];
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Grid Produk')),
+      body: Padding(
+        padding: const EdgeInsets.all(12),
+        child: GridView.builder(
+          itemCount: products.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: 0.75,
+          ),
+          itemBuilder: (context, index) {
+            return ProductCard(product: products[index]);
+          },
         ),
       ),
     );
   }
 }
 
-// Ini adalah widget kustom yang menggabungkan semua elemen
-class ProfileCard extends StatelessWidget {
-  const ProfileCard({super.key});
+// -------------------------------------------------------------
+// KARTU PRODUK
+// -------------------------------------------------------------
+class ProductCard extends StatelessWidget {
+  final Product product;
+
+  const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 300,
-      // Dekorasi untuk membuat tampilan seperti kartu (bayangan, radius)
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.0),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      // Padding internal untuk memberi jarak dari tepi kartu
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
-
-        // (LAYOUT COLUMN)
-        // Layout utama: COLUMN (Menyusun widget ke bawah)
-        child: Column(
-          mainAxisSize:
-              MainAxisSize.min, // Agar ukuran Column pas dengan isinya
-          children: [
-            // 1. (WIDGET IMAGE)
-            // Gambar profil
-            const CircleAvatar(
-              radius: 50,
-              // Kita gunakan gambar placeholder dari internet
-              backgroundImage: NetworkImage('https://picsum.photos/id/237/200'),
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ClipRRect(
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Image.network(
+                product.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  return const Center(
+                    child: Icon(Icons.broken_image, size: 40),
+                  );
+                },
+              ),
             ),
-            const SizedBox(height: 16), // Memberi jarak
-            // (LAYOUT ROW)
-            // Layout kedua: ROW (Menyusun widget ke samping)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 2. (WIDGET TEXT)
-                // Teks Nama Pengguna
-                const Text(
-                  'Hafid Masnurillah',
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                Text(
+                  product.name,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 8), // Jarak antara Teks dan Ikon
-                // 3. (WIDGET ICON)
-                // Ikon Verifikasi
-                const Icon(Icons.verified, color: Colors.blueAccent, size: 20),
+                const SizedBox(height: 6),
+                Text(
+                  product.price,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
-            const SizedBox(height: 8), // Jarak
-            // 4. (WIDGET TEXT)
-            // Teks Bio
-            Text(
-              'Sedang belajar membuat layout kombinasi Row dan Column.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-            ),
-            const SizedBox(height: 24), // Jarak
-            // 5. (WIDGET BUTTON)
-            // Tombol "Ikuti"
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 40,
-                  vertical: 12,
-                ),
-              ),
-              onPressed: () {
-                // Aksi ketika tombol ditekan
-                print('Tombol Ikuti ditekan!');
-              },
-              child: const Text('Ikuti', style: TextStyle(fontSize: 16)),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
